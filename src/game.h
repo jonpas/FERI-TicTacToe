@@ -19,6 +19,7 @@ public:
 
     static const uint8_t BoardSize;
     static const uint8_t MaxTurns;
+    static const Player StartPlayer;
 
     Game();
     ~Game();

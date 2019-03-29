@@ -37,6 +37,6 @@ private:
     Mode getMode();
 
 private slots:
-    void on_tableWidgetBoard_cellClicked(int x, int y);
-    void on_pushButtonRestart_clicked();
+    void on_tableWidgetBoard_cellClicked(int column, int row);
+    void on_pushButtonReset_clicked();
 };

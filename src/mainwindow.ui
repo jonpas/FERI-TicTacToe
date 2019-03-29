@@ -72,9 +72,9 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButtonRestart">
+         <widget class="QPushButton" name="pushButtonReset">
           <property name="text">
-           <string>Restart</string>
+           <string>Reset</string>
           </property>
          </widget>
         </item>

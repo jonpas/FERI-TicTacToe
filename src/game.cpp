@@ -2,6 +2,7 @@
 
 const uint8_t Game::BoardSize = 3;
 const uint8_t Game::MaxTurns = 9;
+const Game::Player Game::StartPlayer = Game::Player::X;
 
 Game::Game() {}
 
@@ -19,7 +20,7 @@ void Game::reset() {
     currentTurn = 0;
 
     currentState = State::Running;
-    currentPlayer = Player::X; // TODO Random? or UI setting (Random, X, O)
+    currentPlayer = StartPlayer;
 }
 
 bool Game::doTurn(QPoint position) {
@@ -30,6 +31,7 @@ bool Game::doTurn(QPoint position) {
         // Advance to next player
         currentPlayer = (currentPlayer == Player::O) ? Player::X : Player::O;
         currentTurn++;
+
         checkEnd();
 
         return true;

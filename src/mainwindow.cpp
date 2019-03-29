@@ -95,35 +95,60 @@ MainWindow::Mode MainWindow::getMode() {
     return static_cast<Mode>(ui->comboBoxMode->currentIndex());
 }
 
-#include <QDebug>
-void MainWindow::on_tableWidgetBoard_cellClicked(int x, int y) {
+void MainWindow::on_tableWidgetBoard_cellClicked(int column, int row) {
     if (game->isOver()) return;
 
+    QPoint position(row, column); // Table Widget reversed!
+
     Game::Player lastPlayer = game->getCurrentPlayer();
-    bool success = game->doTurn({y, x}); // Reversed!
+    bool success = game->doTurn(position);
 
     if (success) {
-        QTableWidgetItem *item = board->item(x, y);
+        QTableWidgetItem *item = board->item(column, row);
 
+        // Mark turn in UI
         if (lastPlayer == Game::Player::X) {
             item->setText("\u2717"); // Ballot X
             item->setForeground(Qt::black);
-            ui->statusBar->showMessage(QString("Player Y turn!"), 10000);
+            ui->statusBar->showMessage(QString("Turn: Y"));
         } else {
             item->setText("\u25ef"); // Large Circle
             item->setForeground(Qt::red);
-            ui->statusBar->showMessage(QString("Player X turn!"), 10000);
+            ui->statusBar->showMessage(QString("Turn: X"));
         }
 
         if (game->isOver()) {
-            ui->statusBar->showMessage(QString("Game over!"), 10000);
+            // Game over
+            switch (game->getCurrentState()) {
+                case Game::State::Draw: {
+                    ui->statusBar->showMessage(QString("Game over! Draw!"));
+                    break;
+                }
+                case Game::State::OWin: {
+                    ui->statusBar->showMessage(QString("Game over! O wins!"));
+                    break;
+                }
+                case Game::State::XWin: {
+                    ui->statusBar->showMessage(QString("Game over! X wins!"));
+                    break;
+                }
+                default: {}
+            }
+        } else if (getMode() == Mode::AI && game->getCurrentPlayer() == Game::Player::O) {
+            // AI mode and next turn is of AI
+            // TODO call AI magic, returns position of next turn
+            // TODO Split all above
+            // TODO - doTurn (split from above)
+            // TODO - Mark turn in UI (split from above)
+            // TODO - Game over messages (split from above)
         }
     } else {
-        ui->statusBar->showMessage(QString("Bad move!"), 10000);
+        // Invalid move
+        ui->statusBar->showMessage(QString("Invalid move!"), 10000);
     }
 }
 
-void MainWindow::on_pushButtonRestart_clicked() {
+void MainWindow::on_pushButtonReset_clicked() {
     resetGame();
 }
 
