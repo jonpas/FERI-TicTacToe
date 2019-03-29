@@ -43,6 +43,20 @@ void MainWindow::populateUi() {
     ui->comboBoxMode->setCurrentIndex(Mode::Multi);
     ui->comboBoxMode->blockSignals(false);
 
+    // Starter
+    ui->comboBoxStarter->blockSignals(true);
+    ui->comboBoxStarter->clear();
+    QMetaEnum starterPlacement = QMetaEnum::fromType<Game::Player>();
+    for (int i = 0; i < starterPlacement.keyCount(); i++) {
+        if (i == 2) { // Rename Player::None to "Random"
+            ui->comboBoxStarter->addItem("Random");
+        } else {
+            ui->comboBoxStarter->addItem(spaceCamelCase(starterPlacement.key(i)));
+        }
+    }
+    ui->comboBoxStarter->setCurrentIndex(Game::Player::X);
+    ui->comboBoxStarter->blockSignals(false);
+
     // Line Edit validations
     //const QIntValidator *validatorUInt = new QIntValidator(0, std::numeric_limits<int>::max(), this);
     //const QIntValidator *validatorNatural = new QIntValidator(1, std::numeric_limits<int>::max(), this);
@@ -101,7 +115,7 @@ void MainWindow::resetGame() {
         }
     }
 
-    game->reset();
+    game->reset(getStarter());
 }
 
 MainWindow::Mode MainWindow::getMode() {
@@ -112,6 +126,10 @@ uint16_t MainWindow::getBoardSize() {
     uint16_t size = static_cast<uint16_t>(ui->lineEditSize->text().toUInt());
     if (size < 3) size = 3; // Manual low-bound validation (validator doesn't handle it)
     return size;
+}
+
+Game::Player MainWindow::getStarter() {
+    return static_cast<Game::Player>(ui->comboBoxStarter->currentIndex());
 }
 
 void MainWindow::on_tableWidgetBoard_cellClicked(int column, int row) {

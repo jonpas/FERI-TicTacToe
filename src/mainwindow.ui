@@ -45,7 +45,7 @@
       <item>
        <layout class="QVBoxLayout" name="options">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayoutMode">
           <item>
            <widget class="QLabel" name="labelMode">
             <property name="text">
@@ -59,7 +59,7 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
+         <layout class="QHBoxLayout" name="horizontalLayoutSize">
           <item>
            <widget class="QLabel" name="labelSize">
             <property name="text">
@@ -79,6 +79,20 @@
              <string>3</string>
             </property>
            </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayoutStartPlayer">
+          <item>
+           <widget class="QLabel" name="labelStarter">
+            <property name="text">
+             <string>Starter:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBoxStarter"/>
           </item>
          </layout>
         </item>

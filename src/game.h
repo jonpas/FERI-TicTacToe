@@ -1,11 +1,15 @@
 #pragma once
 
+#include <random>
 #include <QList>
 
 class Game : public QObject {
     Q_OBJECT
 
 public:
+    static std::mt19937 randGen;
+    static std::uniform_real_distribution<> distProbability;
+
     enum Player { O, X, None };
     Q_ENUM(Player)
     enum State { Running, XWin, OWin, Draw };
@@ -19,13 +23,12 @@ public:
 
     const uint16_t boardSize;
     const uint32_t maxTurns;
-    const Player startPlayer;
 
     Game(uint16_t boardSize_ = 3);
     ~Game();
 
     // Resets game
-    void reset();
+    void reset(Player startPlayer = Player::X);
 
     // Performs turn with current player, returns false if wrong move, true if successful
     bool doTurn(QPoint position);
@@ -36,13 +39,14 @@ public:
 
 private:
     CellList cells;
-    uint8_t currentTurn;
+    uint32_t currentTurn;
 
     State currentState;
     Player currentPlayer;
 
     // Checks if reached end state (player win), returns
-    void checkEnd();
+    State checkEnd();
+    State checkWinner(Player winner);
 
     Cell *getCell(QPoint position);
 };
