@@ -11,10 +11,12 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    minimax.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    minimax.h
 
 FORMS += \
     mainwindow.ui
