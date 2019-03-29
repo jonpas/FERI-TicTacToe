@@ -97,6 +97,33 @@
          </layout>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayoutDifficulty">
+          <item>
+           <widget class="QLabel" name="labelDifficulty">
+            <property name="text">
+             <string>Difficulty:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditDifficulty">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Minimax depth limit (max: Size)</string>
+            </property>
+            <property name="text">
+             <string>4</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>

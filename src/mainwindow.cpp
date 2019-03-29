@@ -58,12 +58,10 @@ void MainWindow::populateUi() {
     ui->comboBoxStarter->blockSignals(false);
 
     // Line Edit validations
-    //const QIntValidator *validatorUInt = new QIntValidator(0, std::numeric_limits<int>::max(), this);
-    //const QIntValidator *validatorNatural = new QIntValidator(1, std::numeric_limits<int>::max(), this);
     const QIntValidator *validatorNaturalUInt16 = new QIntValidator(3, std::numeric_limits<uint16_t>::max(), this);
-    //const QDoubleValidator *validatorRealNorm = new QDoubleValidator(0.0, 1.0, 5, this);
 
     ui->lineEditSize->setValidator(validatorNaturalUInt16);
+    ui->lineEditDifficulty->setValidator(validatorNaturalUInt16);
 }
 
 void MainWindow::setupBoardUi() {
@@ -125,11 +123,20 @@ MainWindow::Mode MainWindow::getMode() {
 uint16_t MainWindow::getBoardSize() {
     uint16_t size = static_cast<uint16_t>(ui->lineEditSize->text().toUInt());
     if (size < 3) size = 3; // Manual low-bound validation (validator doesn't handle it)
+    ui->lineEditSize->setText(QString::number(size));
     return size;
 }
 
 Game::Player MainWindow::getStarter() {
     return static_cast<Game::Player>(ui->comboBoxStarter->currentIndex());
+}
+
+uint16_t MainWindow::getDifficulty() {
+    uint16_t size = static_cast<uint16_t>(ui->lineEditDifficulty->text().toUInt());
+    if (size < 3) size = 3; // Manual low-bound validation (validator doesn't handle it)
+    if (size > getBoardSize()) size = getBoardSize(); // Manual board size validation
+    ui->lineEditDifficulty->setText(QString::number(size));
+    return size;
 }
 
 void MainWindow::on_tableWidgetBoard_cellClicked(int column, int row) {

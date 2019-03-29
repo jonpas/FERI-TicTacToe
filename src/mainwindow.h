@@ -37,6 +37,7 @@ private:
     Mode getMode();
     uint16_t getBoardSize();
     Game::Player getStarter();
+    uint16_t getDifficulty();
 
 private slots:
     void on_tableWidgetBoard_cellClicked(int column, int row);
