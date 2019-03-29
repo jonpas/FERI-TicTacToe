@@ -6,7 +6,7 @@
 
 namespace Minimax {
     struct State {
-        QList<Game::Cell> cells;
+        Game::CellList cells;
         int heuristics;
         int steps = 0;
 
@@ -16,5 +16,5 @@ namespace Minimax {
     };
 
     // TODO Calculate heuristics
-    int calcHeuristics(QList<Game::Cell> cells);
+    int calcHeuristics(Game::CellList cells);
 };

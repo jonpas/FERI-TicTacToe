@@ -13,20 +13,30 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
+    enum Mode { Multi, AI };
+    Q_ENUM(Mode)
+
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
 private:
     Ui::MainWindow *ui;
     QTableWidget *board;
-    QList<Game::Cell> cells;
+    Game *game;
 
     bool eventFilter(QObject */*object*/, QEvent */*event*/) override;
 
     void populateUi();
     void setupBoardUi();
     void resizeBoardUi();
-    void setupBoard();
 
-    uint8_t getBoardSize() { return 3; }
+    void resetGame();
+
+    QString spaceCamelCase(const QString &s);
+
+    Mode getMode();
+
+private slots:
+    void on_tableWidgetBoard_cellClicked(int x, int y);
+    void on_pushButtonRestart_clicked();
 };

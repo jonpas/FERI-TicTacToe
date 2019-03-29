@@ -47,24 +47,14 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QLabel" name="labelTemp">
+           <widget class="QLabel" name="labelMode">
             <property name="text">
-             <string>TODO</string>
+             <string>Mode:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEditTemp">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>TODO</string>
-            </property>
-           </widget>
+           <widget class="QComboBox" name="comboBoxMode"/>
           </item>
          </layout>
         </item>
@@ -80,6 +70,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonRestart">
+          <property name="text">
+           <string>Restart</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

@@ -12,7 +12,8 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    minimax.cpp
+    minimax.cpp \
+    game.cpp
 
 HEADERS += \
     mainwindow.h \
