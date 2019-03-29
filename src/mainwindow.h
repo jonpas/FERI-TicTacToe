@@ -35,6 +35,7 @@ private:
     QString spaceCamelCase(const QString &s);
 
     Mode getMode();
+    uint16_t getBoardSize();
 
 private slots:
     void on_tableWidgetBoard_cellClicked(int column, int row);

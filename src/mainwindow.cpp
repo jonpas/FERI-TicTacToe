@@ -8,9 +8,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     board = ui->tableWidgetBoard;
     board->installEventFilter(this);
     populateUi();
-    setupBoardUi();
 
-    game = new Game();
+    game = new Game(getBoardSize());
+    setupBoardUi();
     resetGame();
 }
 
@@ -43,11 +43,17 @@ void MainWindow::populateUi() {
     ui->comboBoxMode->setCurrentIndex(Mode::Multi);
     ui->comboBoxMode->blockSignals(false);
 
-    // TODO Line Edit validations
+    // Line Edit validations
+    //const QIntValidator *validatorUInt = new QIntValidator(0, std::numeric_limits<int>::max(), this);
+    //const QIntValidator *validatorNatural = new QIntValidator(1, std::numeric_limits<int>::max(), this);
+    const QIntValidator *validatorNaturalUInt16 = new QIntValidator(3, std::numeric_limits<uint16_t>::max(), this);
+    //const QDoubleValidator *validatorRealNorm = new QDoubleValidator(0.0, 1.0, 5, this);
+
+    ui->lineEditSize->setValidator(validatorNaturalUInt16);
 }
 
 void MainWindow::setupBoardUi() {
-    int size = Game::BoardSize;
+    int size = game->boardSize;
 
     board->setRowCount(size);
     board->setColumnCount(size);
@@ -76,10 +82,17 @@ void MainWindow::resizeBoardUi() {
         boardSizeMin = board->size().width();
     }
 
-    board->setFont(QFont("", boardSizeMin / 4));
+    board->setFont(QFont("", static_cast<int>(boardSizeMin / 1.6) / game->boardSize));
 }
 
 void MainWindow::resetGame() {
+    if (getBoardSize() != game->boardSize) {
+        // Full reset (board size changed)
+        delete game;
+        game = new Game(getBoardSize());
+        setupBoardUi();
+    }
+
     // Clear board
     for (int y = 0; y < board->rowCount(); y++) {
         for (int x = 0; x < board->columnCount(); x++) {
@@ -93,6 +106,12 @@ void MainWindow::resetGame() {
 
 MainWindow::Mode MainWindow::getMode() {
     return static_cast<Mode>(ui->comboBoxMode->currentIndex());
+}
+
+uint16_t MainWindow::getBoardSize() {
+    uint16_t size = static_cast<uint16_t>(ui->lineEditSize->text().toUInt());
+    if (size < 3) size = 3; // Manual low-bound validation (validator doesn't handle it)
+    return size;
 }
 
 void MainWindow::on_tableWidgetBoard_cellClicked(int column, int row) {

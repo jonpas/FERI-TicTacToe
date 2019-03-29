@@ -17,11 +17,11 @@ public:
     };
     typedef QList<Cell> CellList;
 
-    static const uint8_t BoardSize;
-    static const uint8_t MaxTurns;
-    static const Player StartPlayer;
+    const uint16_t boardSize;
+    const uint32_t maxTurns;
+    const Player startPlayer;
 
-    Game();
+    Game(uint16_t boardSize_ = 3);
     ~Game();
 
     // Resets game

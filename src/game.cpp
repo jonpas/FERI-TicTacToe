@@ -1,18 +1,18 @@
 #include "game.h"
 
-const uint8_t Game::BoardSize = 3;
-const uint8_t Game::MaxTurns = 9;
-const Game::Player Game::StartPlayer = Game::Player::X;
-
-Game::Game() {}
+Game::Game(uint16_t boardSize_) :
+        boardSize(boardSize_),
+        maxTurns(boardSize_ * boardSize_),
+        startPlayer(Player::X) {
+}
 
 Game::~Game() {}
 
 void Game::reset() {
     cells.clear();
-    cells.reserve(BoardSize * BoardSize);
-    for (int x = 0; x < BoardSize; x++) {
-        for (int y = 0; y < BoardSize; y++) {
+    cells.reserve(boardSize * boardSize);
+    for (int x = 0; x < boardSize; x++) {
+        for (int y = 0; y < boardSize; y++) {
             cells.append({{x, y}, Player::None});
         }
     }
@@ -20,7 +20,7 @@ void Game::reset() {
     currentTurn = 0;
 
     currentState = State::Running;
-    currentPlayer = StartPlayer;
+    currentPlayer = startPlayer;
 }
 
 bool Game::doTurn(QPoint position) {
@@ -53,7 +53,7 @@ Game::State Game::getCurrentState() const {
 
 void Game::checkEnd() {
     // Draw
-    if (currentTurn == MaxTurns) {
+    if (currentTurn == maxTurns) {
         currentState = State::Draw;
         return;
     }
@@ -64,7 +64,7 @@ void Game::checkEnd() {
 }
 
 Game::Cell *Game::getCell(QPoint position) {
-    int index = position.y() + (position.x() * BoardSize);
+    int index = position.y() + (position.x() * boardSize);
     if (index < cells.size()) {
         return &cells[index];
     } else {
