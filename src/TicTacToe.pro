@@ -16,7 +16,8 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
-    minimax.h
+    minimax.h \
+    game.h
 
 FORMS += \
     mainwindow.ui

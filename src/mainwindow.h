@@ -1,5 +1,7 @@
 #pragma once
 
+#include "game.h"
+
 #include <QMainWindow>
 #include <QTableWidget>
 
@@ -7,7 +9,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -17,12 +19,14 @@ public:
 private:
     Ui::MainWindow *ui;
     QTableWidget *board;
-    QList<QPoint> cells;
+    QList<Game::Cell> cells;
 
     bool eventFilter(QObject */*object*/, QEvent */*event*/) override;
 
-    void resizeBoardUi();
-    inline uint8_t getBoardSize() { return 3; }
     void populateUi();
+    void setupBoardUi();
+    void resizeBoardUi();
     void setupBoard();
+
+    uint8_t getBoardSize() { return 3; }
 };

@@ -1,5 +1,5 @@
 #include "minimax.h"
 
-Minimax::Minimax() {
-
+int Minimax::calcHeuristics(QList<Game::Cell> cells) {
+    return 0; // TODO
 }
