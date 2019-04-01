@@ -121,7 +121,10 @@ void MainWindow::gameReset() {
         }
     }
 
-    game->reset();
+    // Reset game with wanted started
+    game->reset(gameGetStarter());
+
+    // Perform first AI turn if AI is starter
     if (gameIsTurnAi()) {
         gameDoTurnAi();
     }
@@ -145,28 +148,20 @@ void MainWindow::gameDoTurnAi() {
 
     if (!success) {
         ui->statusBar->showMessage("Error! AI made invalid move! Reset!");
-        game->stop(gameGetPlayer());
+        game->stop(Game::Player::X);
     }
 }
 
 bool MainWindow::gameIsTurnAi() {
-    return getMode() == Mode::VsAI && game->getCurrentPlayer() == gameGetPlayerAi();
+    return getMode() == Mode::VsAI && game->getCurrentPlayer() == Game::Player::O;
 }
 
-Game::Player MainWindow::gameGetPlayer() {
+Game::Player MainWindow::gameGetStarter() {
     Game::Player player = Game::Player::X;
-    if (getStarter() == Starter::AI) {
+    if (getMode() == Mode::VsAI && getStarter() == Starter::AI) {
         player = Game::Player::O;
     }
     return player;
-}
-
-Game::Player MainWindow::gameGetPlayerAi() {
-    Game::Player aiPlayer = Game::Player::O;
-    if (getStarter() == Starter::AI) {
-        aiPlayer = Game::Player::X;
-    }
-    return aiPlayer;
 }
 
 void MainWindow::gameUpdateUi(bool success, Game::Player lastPlayer, QPoint position) {

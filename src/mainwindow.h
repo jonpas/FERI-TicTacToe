@@ -37,8 +37,7 @@ private:
     bool gameDoTurn(QPoint position);
     void gameDoTurnAi();
     bool gameIsTurnAi();
-    Game::Player gameGetPlayer();
-    Game::Player gameGetPlayerAi();
+    Game::Player gameGetStarter();
     void gameUpdateUi(bool success, Game::Player lastPlayer, QPoint position);
 
     Mode getMode();

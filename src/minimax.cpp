@@ -81,6 +81,19 @@ QPoint Minimax::getAiTurn(Game game, uint32_t difficulty) {
 
     Result result = minimax(&game, max, /*ai*/max, /*enemy*/min, difficulty, alpha, beta);
 
+
+    // Algorithm didn't find a suitable move, so it has no chance of winning anymore
+    // Search for any next empty cell to allow the game to finish
+    if (result.move.x() == -1) {
+        Game::CellList cells = game.getCells();
+        auto it = std::find_if(cells.begin(), cells.end(), [](Game::Cell cell) { return cell.player == Game::Player::None; });
+        if (it == cells.end()) {
+            // No empty cells left (game logic should not let this happen)
+            return {-1, -1};
+        }
+        return it->position;
+    }
+
     return result.move;
 }
 
@@ -95,7 +108,7 @@ Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::P
         score = std::numeric_limits<int>::min(); // -inf
     }
 
-    QPoint move;
+    QPoint move = {-1, -1};
     QList<QPoint> allowedMoves = getAllowedMoves(game);
     for (auto &allowedMove : allowedMoves) {
         // Copy game and do move
