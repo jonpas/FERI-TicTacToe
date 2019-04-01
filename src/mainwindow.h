@@ -44,7 +44,7 @@ private:
     Mode getMode();
     uint16_t getBoardSize();
     Starter getStarter();
-    uint16_t getDifficulty();
+    uint32_t getDifficulty();
     int getAlpha();
     int getBeta();
 

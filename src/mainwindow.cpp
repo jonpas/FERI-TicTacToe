@@ -226,10 +226,13 @@ MainWindow::Starter MainWindow::getStarter() {
     return static_cast<Starter>(ui->comboBoxStarter->currentIndex());
 }
 
-uint16_t MainWindow::getDifficulty() {
+uint32_t MainWindow::getDifficulty() {
     uint16_t size = static_cast<uint16_t>(ui->lineEditDifficulty->text().toUInt());
     if (size < 3) size = 3; // Manual low-bound validation (validator doesn't handle it)
-    if (size > getBoardSize()) size = getBoardSize(); // Manual board size validation
+
+    uint32_t cells = getBoardSize() * getBoardSize();
+    if (size > cells) size = cells; // Manual board size validation
+
     ui->lineEditDifficulty->setText(QString::number(size));
     return size;
 }

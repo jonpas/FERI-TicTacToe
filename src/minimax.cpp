@@ -75,26 +75,32 @@ int Minimax::calcHeuristicsOpen(Game *game, Game::Player enemy)  {
     return h;
 }
 
-QPoint Minimax::getAiTurn(Game game, uint16_t difficulty, int alpha, int beta) {
-    // TODO Minimax
+QPoint Minimax::getAiTurn(Game game, uint32_t difficulty, int alpha, int beta) {
+    // Minimax
     Game::Player max = game.getCurrentPlayer();
     Game::Player min = game.getOtherPlayer();
-    //calcHeuristics(&game, max, min);
     Result result = minimax(&game, max, max, min, difficulty, alpha, beta);
-    return result.move;
+    qDebug() << result.move;
 
-    // Search for next empty cell (temporary)
-    /*Game::CellList cells = game.getCells();
-    auto it = std::find_if(cells.begin(), cells.end(), [](Game::Cell cell) { return cell.player == Game::Player::None; });
-    if (it == cells.end()) {
-        return {-1, -1};
-    }
-    return it->position;*/
+    /*if (result.move.x() == -1) {
+        // TODO This probably shouldn't happen
+        // Algorithm didn't find a suitable move, so it has no chance of winning anymore
+        // Search for any next empty cell
+        Game::CellList cells = game.getCells();
+        auto it = std::find_if(cells.begin(), cells.end(), [](Game::Cell cell) { return cell.player == Game::Player::None; });
+        if (it == cells.end()) {
+            // No empty cells left (game logic should not let this happen)
+            return {-1, -1};
+        }
+        return it->position;
+    }*/
+
+    return result.move;
 }
 
-Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::Player max, Game::Player min, uint16_t depth, int alpha, int beta) {
-    if (/*P je list ||*/ depth == 0) {
-    //     return (f(P), NIL)
+Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::Player max, Game::Player min, uint32_t depth, int alpha, int beta) {
+    // Game ended or maximum depth reached
+    if (game->getCurrentState() != Game::State::Running || depth == 0) {
         return {calcHeuristics(game, max, min), {-1, -1}};
     }
 
@@ -105,7 +111,7 @@ Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::P
         score = std::numeric_limits<int>::max(); // inf
     }
 
-    QPoint move;
+    QPoint move; // = {-1, -1};
     QList<QPoint> allowedMoves = getAllowedMoves(game);
     for (auto &allowedMove : allowedMoves) {
         // Copy game and do move
@@ -113,9 +119,7 @@ Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::P
         moveGame.doTurn(allowedMove);
 
         // Run minimax on new move with other player
-        Game::Player moveMax = moveGame.getCurrentPlayer();
-        Game::Player moveMin = moveGame.getOtherPlayer();
-        Result result = minimax(&moveGame, moveMax, moveMax, moveMin, depth - 1, alpha, beta);
+        Result result = minimax(&moveGame, moveGame.getCurrentPlayer(), max, min, depth - 1, alpha, beta);
 
         // Update best move if better than last found best move and track alpha-beta pruning
         if (currentPlayer == max && result.score > score) {

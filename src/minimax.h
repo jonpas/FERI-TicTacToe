@@ -16,10 +16,11 @@ namespace Minimax {
     int calcHeuristicsOpen(Game *game, Game::Player enemy);
 
     // Start minimax search, receives copy of current game
-    QPoint getAiTurn(Game game, uint16_t difficulty, int alpha, int beta);
+    QPoint getAiTurn(Game game, uint32_t difficulty, int alpha, int beta);
 
     // Minimax algorithm
-    Result minimax(Game *game, Game::Player currentPlayer, Game::Player max, Game::Player min, uint16_t depth, int alpha, int beta);
+    Result minimax(Game *game, Game::Player currentPlayer, Game::Player max, Game::Player min, uint32_t depth, int alpha, int beta);
 
+    // Gets all allowed moves (any empty cell)
     QList<QPoint> getAllowedMoves(/*const*/ Game *game);
 };
