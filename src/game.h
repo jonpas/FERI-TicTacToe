@@ -7,10 +7,7 @@ class Game : public QObject {
     Q_OBJECT
 
 public:
-    static std::mt19937 randGen;
-    static std::uniform_real_distribution<> distProbability;
-
-    enum Player { O, X, None };
+    enum Player { X, O, None };
     Q_ENUM(Player)
     enum State { Running, XWin, OWin, Draw };
     Q_ENUM(State)
@@ -25,10 +22,12 @@ public:
     const uint32_t maxTurns;
 
     Game(uint16_t boardSize_ = 3);
+    Game(const Game &game);
     ~Game();
 
     // Resets game
     void reset(Player startPlayer = Player::X);
+    void stop(Player winner);
 
     // Performs turn with current player, returns false if wrong move, true if successful
     bool doTurn(QPoint position);
@@ -36,6 +35,7 @@ public:
     Player getCurrentPlayer() const;
     bool isOver() const;
     State getCurrentState() const;
+    CellList getCells() const;
 
 private:
     CellList cells;

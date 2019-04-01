@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "minimax.h"
 
 #include <QMetaEnum>
 
@@ -12,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     game = new Game(getBoardSize());
     setupBoardUi();
-    resetGame();
+    gameReset();
 }
 
 MainWindow::~MainWindow() {
@@ -41,13 +42,13 @@ void MainWindow::populateUi() {
     for (int i = 0; i < modePlacement.keyCount(); i++) {
         ui->comboBoxMode->addItem(spaceCamelCase(modePlacement.key(i)));
     }
-    ui->comboBoxMode->setCurrentIndex(Mode::AI);
+    ui->comboBoxMode->setCurrentIndex(Mode::VsAI);
     ui->comboBoxMode->blockSignals(false);
 
     // Starter
     ui->comboBoxStarter->blockSignals(true);
     ui->comboBoxStarter->clear();
-    QMetaEnum starterPlacement = QMetaEnum::fromType<Game::Player>();
+    QMetaEnum starterPlacement = QMetaEnum::fromType<Starter>();
     for (int i = 0; i < starterPlacement.keyCount(); i++) {
         if (i == 2) { // Rename Player::None
             ui->comboBoxStarter->addItem("Random");
@@ -55,7 +56,7 @@ void MainWindow::populateUi() {
             ui->comboBoxStarter->addItem(spaceCamelCase(starterPlacement.key(i)));
         }
     }
-    ui->comboBoxStarter->setCurrentIndex(Game::Player::X);
+    ui->comboBoxStarter->setCurrentIndex(Starter::Player);
     ui->comboBoxStarter->blockSignals(false);
 
     // Line Edit validations
@@ -67,8 +68,8 @@ void MainWindow::populateUi() {
 
 void MainWindow::toggleOptions() {
     Mode mode = getMode();
-    ui->optionsModeAIWidget->setHidden(mode != Mode::AI);
-    ui->optionsModeMultiWidget->setHidden(mode != Mode::Multi);
+    ui->optionsModeAIWidget->setHidden(mode != Mode::VsAI);
+    ui->optionsModeMultiWidget->setHidden(mode != Mode::VsMulti);
 }
 
 void MainWindow::setupBoardUi() {
@@ -104,7 +105,7 @@ void MainWindow::resizeBoardUi() {
     board->setFont(QFont("", static_cast<int>(boardSizeMin / 1.6) / game->boardSize));
 }
 
-void MainWindow::resetGame() {
+void MainWindow::gameReset() {
     if (getBoardSize() != game->boardSize) {
         // Full reset (board size changed)
         delete game;
@@ -120,7 +121,91 @@ void MainWindow::resetGame() {
         }
     }
 
-    game->reset(getStarter());
+    game->reset();
+    if (gameIsTurnAi()) {
+        gameDoTurnAi();
+    }
+}
+
+bool MainWindow::gameDoTurn(QPoint position) {
+    Game::Player lastPlayer = game->getCurrentPlayer();
+    bool success = game->doTurn(position);
+    gameUpdateUi(success, lastPlayer, position);
+
+    if (success && !game->isOver() && gameIsTurnAi()) {
+        gameDoTurnAi();
+    }
+
+    return success;
+}
+
+void MainWindow::gameDoTurnAi() {
+    QPoint position = Minimax::getAiTurn(*game);
+    bool success = gameDoTurn(position);
+
+    if (!success) {
+        ui->statusBar->showMessage("Error! AI made invalid move! Reset!");
+        game->stop(gameGetPlayer());
+    }
+}
+
+bool MainWindow::gameIsTurnAi() {
+    return getMode() == Mode::VsAI && game->getCurrentPlayer() == gameGetPlayerAi();
+}
+
+Game::Player MainWindow::gameGetPlayer() {
+    Game::Player player = Game::Player::X;
+    if (getStarter() == Starter::AI) {
+        player = Game::Player::O;
+    }
+    return player;
+}
+
+Game::Player MainWindow::gameGetPlayerAi() {
+    Game::Player aiPlayer = Game::Player::O;
+    if (getStarter() == Starter::AI) {
+        aiPlayer = Game::Player::X;
+    }
+    return aiPlayer;
+}
+
+void MainWindow::gameUpdateUi(bool success, Game::Player lastPlayer, QPoint position) {
+    if (success) {
+        QTableWidgetItem *item = board->item(position.y(), position.x()); // Table Widget reversed!
+
+        // Mark turn in UI
+        if (lastPlayer == Game::Player::X) {
+            item->setText("\u2717"); // Ballot X
+            item->setForeground(Qt::black);
+            ui->statusBar->showMessage("Turn: Y");
+        } else {
+            item->setText("\u25ef"); // Large Circle
+            item->setForeground(Qt::red);
+            ui->statusBar->showMessage("Turn: X");
+        }
+
+        if (game->isOver()) {
+            // Game over
+            switch (game->getCurrentState()) {
+                case Game::State::Draw: {
+                    ui->statusBar->showMessage("Game over! Draw!");
+                    break;
+                }
+                case Game::State::OWin: {
+                    ui->statusBar->showMessage("Game over! O won!");
+                    break;
+                }
+                case Game::State::XWin: {
+                    ui->statusBar->showMessage("Game over! X won!");
+                    break;
+                }
+                default: {}
+            }
+        }
+    } else {
+        // Invalid move
+        ui->statusBar->showMessage("Invalid move!");
+    }
 }
 
 MainWindow::Mode MainWindow::getMode() {
@@ -134,8 +219,8 @@ uint16_t MainWindow::getBoardSize() {
     return size;
 }
 
-Game::Player MainWindow::getStarter() {
-    return static_cast<Game::Player>(ui->comboBoxStarter->currentIndex());
+MainWindow::Starter MainWindow::getStarter() {
+    return static_cast<Starter>(ui->comboBoxStarter->currentIndex());
 }
 
 uint16_t MainWindow::getDifficulty() {
@@ -147,64 +232,31 @@ uint16_t MainWindow::getDifficulty() {
 }
 
 void MainWindow::on_tableWidgetBoard_cellClicked(int column, int row) {
-    if (game->isOver()) return;
+    if (game->isOver()) {
+        ui->statusBar->showMessage(QString("Game is over! Reset!"));
+        return;
+    }
 
     QPoint position(row, column); // Table Widget reversed!
-
-    Game::Player lastPlayer = game->getCurrentPlayer();
-    bool success = game->doTurn(position);
-
-    if (success) {
-        QTableWidgetItem *item = board->item(column, row);
-
-        // Mark turn in UI
-        if (lastPlayer == Game::Player::X) {
-            item->setText("\u2717"); // Ballot X
-            item->setForeground(Qt::black);
-            ui->statusBar->showMessage(QString("Turn: Y"));
-        } else {
-            item->setText("\u25ef"); // Large Circle
-            item->setForeground(Qt::red);
-            ui->statusBar->showMessage(QString("Turn: X"));
-        }
-
-        if (game->isOver()) {
-            // Game over
-            switch (game->getCurrentState()) {
-                case Game::State::Draw: {
-                    ui->statusBar->showMessage(QString("Game over! Draw!"));
-                    break;
-                }
-                case Game::State::OWin: {
-                    ui->statusBar->showMessage(QString("Game over! O wins!"));
-                    break;
-                }
-                case Game::State::XWin: {
-                    ui->statusBar->showMessage(QString("Game over! X wins!"));
-                    break;
-                }
-                default: {}
-            }
-        } else if (getMode() == Mode::AI && game->getCurrentPlayer() == Game::Player::O) {
-            // AI mode and next turn is of AI
-            // TODO call AI magic, returns position of next turn
-            // TODO Split all above
-            // TODO - doTurn (split from above)
-            // TODO - Mark turn in UI (split from above)
-            // TODO - Game over messages (split from above)
-        }
-    } else {
-        // Invalid move
-        ui->statusBar->showMessage(QString("Invalid move!"), 10000);
-    }
+    gameDoTurn(position);
 }
 
 void MainWindow::on_pushButtonReset_clicked() {
-    resetGame();
+    ui->statusBar->showMessage("");
+    gameReset();
 }
 
 void MainWindow::on_comboBoxMode_currentIndexChanged(int /*index*/) {
     toggleOptions();
+    gameReset();
+}
+
+void MainWindow::on_comboBoxStarter_currentIndexChanged(int /*index*/) {
+    gameReset();
+}
+
+void MainWindow::on_lineEditSize_textChanged(const QString &/*arg1*/) {
+    gameReset();
 }
 
 QString MainWindow::spaceCamelCase(const QString &s) {

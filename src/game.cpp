@@ -1,11 +1,18 @@
 #include "game.h"
 
-std::mt19937 Game::randGen = std::mt19937{std::random_device{}()};
-std::uniform_real_distribution<> Game::distProbability = std::uniform_real_distribution<>(0.0, 1.0);
-
 Game::Game(uint16_t boardSize_) :
         boardSize(boardSize_),
         maxTurns(boardSize_ * boardSize_) {
+}
+
+Game::Game(const Game &game) :
+        QObject(),
+        boardSize(game.boardSize),
+        maxTurns(game.maxTurns),
+        cells(game.cells),
+        currentTurn(game.currentTurn),
+        currentState(game.currentState),
+        currentPlayer(game.currentPlayer) {
 }
 
 Game::~Game() {}
@@ -23,14 +30,15 @@ void Game::reset(Player startPlayer) {
     currentState = State::Running;
 
     currentPlayer = startPlayer;
-    if (currentPlayer == Player::None) {
-        currentPlayer = (distProbability(randGen) > 0.5) ? Player::X : Player::O;
-    }
+}
+
+void Game::stop(Player winner) {
+    currentState = checkWinner(winner);
 }
 
 bool Game::doTurn(QPoint position) {
     Cell *cell = getCell(position);
-    if (cell->player == Player::None) {
+    if (cell != nullptr && cell->player == Player::None) {
         cell->player = currentPlayer;
 
         // Advance to next player
@@ -55,6 +63,10 @@ bool Game::isOver() const {
 
 Game::State Game::getCurrentState() const {
     return currentState;
+}
+
+Game::CellList Game::getCells() const {
+    return cells;
 }
 
 Game::State Game::checkEnd() {
@@ -123,7 +135,7 @@ Game::State Game::checkWinner(Player winner) {
 
 Game::Cell *Game::getCell(QPoint position) {
     int index = position.y() + (position.x() * boardSize);
-    if (index < cells.size()) {
+    if (index < cells.size() && index >= 0) {
         return &cells[index];
     } else {
         return nullptr;

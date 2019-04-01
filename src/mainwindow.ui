@@ -95,20 +95,6 @@
            </item>
           </layout>
          </item>
-         <item>
-          <layout class="QHBoxLayout" name="optionStartPlayer">
-           <item>
-            <widget class="QLabel" name="labelStarter">
-             <property name="text">
-              <string>Starter:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="comboBoxStarter"/>
-           </item>
-          </layout>
-         </item>
         </layout>
        </widget>
       </item>
@@ -127,6 +113,20 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
+         <item>
+          <layout class="QHBoxLayout" name="optionStartPlayer">
+           <item>
+            <widget class="QLabel" name="labelStarter">
+             <property name="text">
+              <string>Starter:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxStarter"/>
+           </item>
+          </layout>
+         </item>
          <item>
           <layout class="QHBoxLayout" name="optionDifficulty">
            <property name="sizeConstraint">

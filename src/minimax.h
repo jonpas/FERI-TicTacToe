@@ -17,4 +17,7 @@ namespace Minimax {
 
     // TODO Calculate heuristics
     int calcHeuristics(Game::CellList cells);
+
+    // Start minimax search, receives copy of current game
+    QPoint getAiTurn(Game game);
 };
