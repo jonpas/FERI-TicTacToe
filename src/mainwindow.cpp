@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     board = ui->tableWidgetBoard;
     board->installEventFilter(this);
     populateUi();
+    toggleOptions();
 
     game = new Game(getBoardSize());
     setupBoardUi();
@@ -40,7 +41,7 @@ void MainWindow::populateUi() {
     for (int i = 0; i < modePlacement.keyCount(); i++) {
         ui->comboBoxMode->addItem(spaceCamelCase(modePlacement.key(i)));
     }
-    ui->comboBoxMode->setCurrentIndex(Mode::Multi);
+    ui->comboBoxMode->setCurrentIndex(Mode::AI);
     ui->comboBoxMode->blockSignals(false);
 
     // Starter
@@ -48,7 +49,7 @@ void MainWindow::populateUi() {
     ui->comboBoxStarter->clear();
     QMetaEnum starterPlacement = QMetaEnum::fromType<Game::Player>();
     for (int i = 0; i < starterPlacement.keyCount(); i++) {
-        if (i == 2) { // Rename Player::None to "Random"
+        if (i == 2) { // Rename Player::None
             ui->comboBoxStarter->addItem("Random");
         } else {
             ui->comboBoxStarter->addItem(spaceCamelCase(starterPlacement.key(i)));
@@ -62,6 +63,12 @@ void MainWindow::populateUi() {
 
     ui->lineEditSize->setValidator(validatorNaturalUInt16);
     ui->lineEditDifficulty->setValidator(validatorNaturalUInt16);
+}
+
+void MainWindow::toggleOptions() {
+    Mode mode = getMode();
+    ui->optionsModeAIWidget->setHidden(mode != Mode::AI);
+    ui->optionsModeMultiWidget->setHidden(mode != Mode::Multi);
 }
 
 void MainWindow::setupBoardUi() {
@@ -194,6 +201,10 @@ void MainWindow::on_tableWidgetBoard_cellClicked(int column, int row) {
 
 void MainWindow::on_pushButtonReset_clicked() {
     resetGame();
+}
+
+void MainWindow::on_comboBoxMode_currentIndexChanged(int /*index*/) {
+    toggleOptions();
 }
 
 QString MainWindow::spaceCamelCase(const QString &s) {

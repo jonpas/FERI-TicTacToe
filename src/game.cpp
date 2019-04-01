@@ -58,12 +58,6 @@ Game::State Game::getCurrentState() const {
 }
 
 Game::State Game::checkEnd() {
-    // Draw
-    if (currentTurn == maxTurns) {
-        currentState = State::Draw;
-        return State::Draw;
-    }
-
     // Diagonal Top-Left <-> Bottom-Right
     Player winner = getCell({0, 0})->player;
     for (int x = 1; x < boardSize; x++) {
@@ -108,6 +102,13 @@ Game::State Game::checkEnd() {
         if (winner != Player::None) return checkWinner(winner);
     }
 
+    // Draw
+    if (currentTurn == maxTurns) {
+        currentState = State::Draw;
+        return State::Draw;
+    }
+
+    // Running
     return State::Running;
 }
 

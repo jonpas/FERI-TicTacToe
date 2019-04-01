@@ -27,19 +27,21 @@ private:
     bool eventFilter(QObject */*object*/, QEvent */*event*/) override;
 
     void populateUi();
+    void toggleOptions();
     void setupBoardUi();
     void resizeBoardUi();
 
     void resetGame();
-
-    QString spaceCamelCase(const QString &s);
 
     Mode getMode();
     uint16_t getBoardSize();
     Game::Player getStarter();
     uint16_t getDifficulty();
 
+    QString spaceCamelCase(const QString &s);
+
 private slots:
     void on_tableWidgetBoard_cellClicked(int column, int row);
     void on_pushButtonReset_clicked();
+    void on_comboBoxMode_currentIndexChanged(int /*index*/);
 };
