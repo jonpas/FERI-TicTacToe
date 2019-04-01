@@ -5,14 +5,9 @@
 #include <QList>
 
 namespace Minimax {
-    struct State {
-        Game::CellList cells;
-        int heuristics;
-        int steps = 0;
-
-        bool operator<(const State &s) const {
-            return heuristics < s.heuristics;
-        }
+    struct Result {
+        int score;
+        QPoint move;
     };
 
     // Calculate heuristics
@@ -21,5 +16,10 @@ namespace Minimax {
     int calcHeuristicsOpen(Game *game, Game::Player enemy);
 
     // Start minimax search, receives copy of current game
-    QPoint getAiTurn(Game game);
+    QPoint getAiTurn(Game game, uint16_t difficulty);
+
+    // Minimax algorithm
+    Result minimax(Game *game, Game::Player currentPlayer, Game::Player max, Game::Player min, uint16_t depth);
+
+    QList<QPoint> getAllowedMoves(/*const*/ Game *game);
 };

@@ -8,9 +8,9 @@ int Minimax::calcHeuristics(Game *game, Game::Player max, Game::Player min) {
 
     int heuristics = 0;
     if (winner == max) {
-        heuristics = 100; // TODO inf
+        heuristics = std::numeric_limits<int>::max(); // inf
     } else if (winner == min) {
-        heuristics = -1; // TODO -inf
+        heuristics = std::numeric_limits<int>::min(); // -inf
     } else {
         // Number of rows, columns and diagonals open for MAX
         // - number of rows, columns and diagonals open for MIN
@@ -75,15 +75,68 @@ int Minimax::calcHeuristicsOpen(Game *game, Game::Player enemy)  {
     return h;
 }
 
-QPoint Minimax::getAiTurn(Game game) {
+QPoint Minimax::getAiTurn(Game game, uint16_t difficulty) {
     // TODO Minimax
-    calcHeuristics(&game, game.getCurrentPlayer(), game.getOtherPlayer());
+    Game::Player max = game.getCurrentPlayer();
+    Game::Player min = game.getOtherPlayer();
+    //calcHeuristics(&game, max, min);
+    Result result = minimax(&game, max, max, min, difficulty);
+    return result.move;
 
     // Search for next empty cell (temporary)
-    Game::CellList cells = game.getCells();
+    /*Game::CellList cells = game.getCells();
     auto it = std::find_if(cells.begin(), cells.end(), [](Game::Cell cell) { return cell.player == Game::Player::None; });
     if (it == cells.end()) {
         return {-1, -1};
     }
-    return it->position;
+    return it->position;*/
+}
+
+Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::Player max, Game::Player min, uint16_t depth) {
+    if (/*P je list ||*/ depth == 0) {
+    //     return (f(P), NIL)
+        return {calcHeuristics(game, max, min), {-1, -1}};
+    }
+
+    int score;
+    if (currentPlayer == max) {
+        score = std::numeric_limits<int>::min(); // -inf
+    } else {
+        score = std::numeric_limits<int>::max(); // inf
+    }
+
+    QPoint move;
+    QList<QPoint> allowedMoves = getAllowedMoves(game);
+    for (auto &allowedMove : allowedMoves) {
+        // Copy game and do move
+        Game moveGame(*game);
+        moveGame.doTurn(allowedMove);
+
+        // Run minimax on new move with other player
+        Game::Player moveMax = moveGame.getCurrentPlayer();
+        Game::Player moveMin = moveGame.getOtherPlayer();
+        Result result = minimax(&moveGame, moveMax, moveMax, moveMin, depth - 1);
+
+        // Update best move if better than last found best move
+        if ((currentPlayer == max && result.score > score) || (currentPlayer == min && result.score < score)) {
+            score = result.score;
+            move = allowedMove;
+        }
+    }
+
+    return {score, move};
+}
+
+QList<QPoint> Minimax::getAllowedMoves(/*const*/ Game *game) {
+    QList<QPoint> moves;
+
+    for (int x = 0; x < game->boardSize; x++) {
+        for (int y = 0; y < game->boardSize; y++) {
+            if (game->getCell({x, y})->player == Game::Player::None) {
+                moves.push_back({x, y});
+            }
+        }
+    }
+
+    return moves;
 }

@@ -140,7 +140,7 @@ bool MainWindow::gameDoTurn(QPoint position) {
 }
 
 void MainWindow::gameDoTurnAi() {
-    QPoint position = Minimax::getAiTurn(*game);
+    QPoint position = Minimax::getAiTurn(*game, getDifficulty());
     bool success = gameDoTurn(position);
 
     if (!success) {
