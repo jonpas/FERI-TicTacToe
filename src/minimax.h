@@ -16,7 +16,7 @@ namespace Minimax {
     int calcHeuristicsOpen(Game *game, Game::Player enemy);
 
     // Start minimax search, receives copy of current game
-    QPoint getAiTurn(Game game, uint32_t difficulty, int alpha, int beta);
+    QPoint getAiTurn(Game game, uint32_t difficulty);
 
     // Minimax algorithm
     Result minimax(Game *game, Game::Player currentPlayer, Game::Player max, Game::Player min, uint32_t depth, int alpha, int beta);

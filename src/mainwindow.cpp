@@ -61,12 +61,9 @@ void MainWindow::populateUi() {
 
     // Line Edit validations
     const QIntValidator *validatorNaturalUInt16 = new QIntValidator(3, std::numeric_limits<uint16_t>::max(), this);
-    const QIntValidator *validatorInt = new QIntValidator(this);
 
     ui->lineEditSize->setValidator(validatorNaturalUInt16);
     ui->lineEditDifficulty->setValidator(validatorNaturalUInt16);
-    ui->lineEditAlpha->setValidator(validatorInt);
-    ui->lineEditBeta->setValidator(validatorInt);
 }
 
 void MainWindow::toggleOptions() {
@@ -143,7 +140,7 @@ bool MainWindow::gameDoTurn(QPoint position) {
 }
 
 void MainWindow::gameDoTurnAi() {
-    QPoint position = Minimax::getAiTurn(*game, getDifficulty(), getAlpha(), getBeta());
+    QPoint position = Minimax::getAiTurn(*game, getDifficulty());
     bool success = gameDoTurn(position);
 
     if (!success) {
@@ -227,22 +224,14 @@ MainWindow::Starter MainWindow::getStarter() {
 }
 
 uint32_t MainWindow::getDifficulty() {
-    uint16_t size = static_cast<uint16_t>(ui->lineEditDifficulty->text().toUInt());
-    if (size < 3) size = 3; // Manual low-bound validation (validator doesn't handle it)
+    uint32_t size = ui->lineEditDifficulty->text().toUInt();
+    if (size < 1) size = 1; // Manual low-bound validation (validator doesn't handle it)
 
     uint32_t cells = getBoardSize() * getBoardSize();
     if (size > cells) size = cells; // Manual board size validation
 
     ui->lineEditDifficulty->setText(QString::number(size));
     return size;
-}
-
-int MainWindow::getAlpha() {
-    return ui->lineEditAlpha->text().toInt();
-}
-
-int MainWindow::getBeta() {
-    return ui->lineEditBeta->text().toInt();
 }
 
 void MainWindow::on_tableWidgetBoard_cellClicked(int column, int row) {

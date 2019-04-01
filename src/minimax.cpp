@@ -1,7 +1,5 @@
 #include "minimax.h"
 
-#include <QDebug>
-
 int Minimax::calcHeuristics(Game *game, Game::Player max, Game::Player min) {
     Game::State state = game->checkEnd();
     Game::Player winner = game->getWinnerFromState(state);
@@ -16,11 +14,9 @@ int Minimax::calcHeuristics(Game *game, Game::Player max, Game::Player min) {
         // - number of rows, columns and diagonals open for MIN
         int hmax = calcHeuristicsOpen(game, /*enemy*/min);
         int hmin = calcHeuristicsOpen(game, /*enemy*/max);
-        qDebug() << "max h =" << hmax << "| min h=" << hmin;
         heuristics = hmax - hmin;
     }
 
-    qDebug() << "h =" << heuristics;
     return heuristics;
 }
 
@@ -75,25 +71,15 @@ int Minimax::calcHeuristicsOpen(Game *game, Game::Player enemy)  {
     return h;
 }
 
-QPoint Minimax::getAiTurn(Game game, uint32_t difficulty, int alpha, int beta) {
+QPoint Minimax::getAiTurn(Game game, uint32_t difficulty) {
     // Minimax
     Game::Player max = game.getCurrentPlayer();
     Game::Player min = game.getOtherPlayer();
-    Result result = minimax(&game, max, max, min, difficulty, alpha, beta);
-    qDebug() << result.move;
 
-    /*if (result.move.x() == -1) {
-        // TODO This probably shouldn't happen
-        // Algorithm didn't find a suitable move, so it has no chance of winning anymore
-        // Search for any next empty cell
-        Game::CellList cells = game.getCells();
-        auto it = std::find_if(cells.begin(), cells.end(), [](Game::Cell cell) { return cell.player == Game::Player::None; });
-        if (it == cells.end()) {
-            // No empty cells left (game logic should not let this happen)
-            return {-1, -1};
-        }
-        return it->position;
-    }*/
+    int alpha = std::numeric_limits<int>::min(); // -inf
+    int beta = std::numeric_limits<int>::max(); // inf
+
+    Result result = minimax(&game, max, /*ai*/max, /*enemy*/min, difficulty, alpha, beta);
 
     return result.move;
 }
@@ -104,14 +90,12 @@ Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::P
         return {calcHeuristics(game, max, min), {-1, -1}};
     }
 
-    int score;
+    int score = std::numeric_limits<int>::max(); // inf;
     if (currentPlayer == max) {
         score = std::numeric_limits<int>::min(); // -inf
-    } else {
-        score = std::numeric_limits<int>::max(); // inf
     }
 
-    QPoint move; // = {-1, -1};
+    QPoint move;
     QList<QPoint> allowedMoves = getAllowedMoves(game);
     for (auto &allowedMove : allowedMoves) {
         // Copy game and do move
@@ -125,12 +109,14 @@ Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::P
         if (currentPlayer == max && result.score > score) {
             score = result.score;
             move = allowedMove;
+
             if (score > alpha) alpha = score;
         }
 
         if (currentPlayer == min && result.score < score) {
             score = result.score;
             move = allowedMove;
+
             if (score < beta) beta = score;
         }
 
