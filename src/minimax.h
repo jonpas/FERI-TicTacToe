@@ -15,8 +15,10 @@ namespace Minimax {
         }
     };
 
-    // TODO Calculate heuristics
-    int calcHeuristics(Game::CellList cells);
+    // Calculate heuristics
+    int calcHeuristics(Game *game, Game::Player max, Game::Player min);
+    // Counts number of rows, columns and diagonals open for given player
+    int calcHeuristicsOpen(Game *game, Game::Player enemy);
 
     // Start minimax search, receives copy of current game
     QPoint getAiTurn(Game game);

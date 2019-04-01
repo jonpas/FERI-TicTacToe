@@ -53,22 +53,6 @@ bool Game::doTurn(QPoint position) {
     return false;
 }
 
-Game::Player Game::getCurrentPlayer() const {
-    return currentPlayer;
-}
-
-bool Game::isOver() const {
-    return currentState != State::Running;
-}
-
-Game::State Game::getCurrentState() const {
-    return currentState;
-}
-
-Game::CellList Game::getCells() const {
-    return cells;
-}
-
 Game::State Game::checkEnd() {
     // Diagonal Top-Left <-> Bottom-Right
     Player winner = getCell({0, 0})->player;
@@ -124,13 +108,27 @@ Game::State Game::checkEnd() {
     return State::Running;
 }
 
-Game::State Game::checkWinner(Player winner) {
-    if (winner == Player::O) {
-        return State::OWin;
-    } else if (winner == Player::X) {
-        return State::XWin;
+Game::Player Game::getCurrentPlayer() const {
+    return currentPlayer;
+}
+
+Game::Player Game::getOtherPlayer() const {
+    if (currentPlayer == Player::X) {
+        return Player::O;
     }
-    return State::Running;
+    return Player::X;
+}
+
+Game::State Game::getCurrentState() const {
+    return currentState;
+}
+
+bool Game::isOver() const {
+    return currentState != State::Running;
+}
+
+Game::CellList Game::getCells() const {
+    return cells;
 }
 
 Game::Cell *Game::getCell(QPoint position) {
@@ -140,4 +138,22 @@ Game::Cell *Game::getCell(QPoint position) {
     } else {
         return nullptr;
     }
+}
+
+Game::Player Game::getWinnerFromState(State state) {
+    if (state == State::XWin) {
+        return Player::X;
+    } else if (state == State::OWin) {
+        return Player::O;
+    }
+    return Player::None;
+}
+
+Game::State Game::checkWinner(Player winner) {
+    if (winner == Player::O) {
+        return State::OWin;
+    } else if (winner == Player::X) {
+        return State::XWin;
+    }
+    return State::Running;
 }

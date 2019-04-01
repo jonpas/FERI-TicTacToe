@@ -27,15 +27,21 @@ public:
 
     // Resets game
     void reset(Player startPlayer = Player::X);
+    // Stops game, setting given player as winner
     void stop(Player winner);
-
     // Performs turn with current player, returns false if wrong move, true if successful
     bool doTurn(QPoint position);
+    // Checks if reached end state (player win)
+    State checkEnd();
 
     Player getCurrentPlayer() const;
-    bool isOver() const;
+    Player getOtherPlayer() const;
     State getCurrentState() const;
+    bool isOver() const;
     CellList getCells() const;
+    Cell *getCell(QPoint position);
+
+    static Player getWinnerFromState(State state);
 
 private:
     CellList cells;
@@ -44,9 +50,5 @@ private:
     State currentState;
     Player currentPlayer;
 
-    // Checks if reached end state (player win), returns
-    State checkEnd();
     State checkWinner(Player winner);
-
-    Cell *getCell(QPoint position);
 };
