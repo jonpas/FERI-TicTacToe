@@ -61,9 +61,12 @@ void MainWindow::populateUi() {
 
     // Line Edit validations
     const QIntValidator *validatorNaturalUInt16 = new QIntValidator(3, std::numeric_limits<uint16_t>::max(), this);
+    const QIntValidator *validatorInt = new QIntValidator(this);
 
     ui->lineEditSize->setValidator(validatorNaturalUInt16);
     ui->lineEditDifficulty->setValidator(validatorNaturalUInt16);
+    ui->lineEditAlpha->setValidator(validatorInt);
+    ui->lineEditBeta->setValidator(validatorInt);
 }
 
 void MainWindow::toggleOptions() {
@@ -140,7 +143,7 @@ bool MainWindow::gameDoTurn(QPoint position) {
 }
 
 void MainWindow::gameDoTurnAi() {
-    QPoint position = Minimax::getAiTurn(*game, getDifficulty());
+    QPoint position = Minimax::getAiTurn(*game, getDifficulty(), getAlpha(), getBeta());
     bool success = gameDoTurn(position);
 
     if (!success) {
@@ -229,6 +232,14 @@ uint16_t MainWindow::getDifficulty() {
     if (size > getBoardSize()) size = getBoardSize(); // Manual board size validation
     ui->lineEditDifficulty->setText(QString::number(size));
     return size;
+}
+
+int MainWindow::getAlpha() {
+    return ui->lineEditAlpha->text().toInt();
+}
+
+int MainWindow::getBeta() {
+    return ui->lineEditBeta->text().toInt();
 }
 
 void MainWindow::on_tableWidgetBoard_cellClicked(int column, int row) {

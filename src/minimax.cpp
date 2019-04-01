@@ -75,12 +75,12 @@ int Minimax::calcHeuristicsOpen(Game *game, Game::Player enemy)  {
     return h;
 }
 
-QPoint Minimax::getAiTurn(Game game, uint16_t difficulty) {
+QPoint Minimax::getAiTurn(Game game, uint16_t difficulty, int alpha, int beta) {
     // TODO Minimax
     Game::Player max = game.getCurrentPlayer();
     Game::Player min = game.getOtherPlayer();
     //calcHeuristics(&game, max, min);
-    Result result = minimax(&game, max, max, min, difficulty);
+    Result result = minimax(&game, max, max, min, difficulty, alpha, beta);
     return result.move;
 
     // Search for next empty cell (temporary)
@@ -92,7 +92,7 @@ QPoint Minimax::getAiTurn(Game game, uint16_t difficulty) {
     return it->position;*/
 }
 
-Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::Player max, Game::Player min, uint16_t depth) {
+Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::Player max, Game::Player min, uint16_t depth, int alpha, int beta) {
     if (/*P je list ||*/ depth == 0) {
     //     return (f(P), NIL)
         return {calcHeuristics(game, max, min), {-1, -1}};
@@ -115,12 +115,24 @@ Minimax::Result Minimax::minimax(Game *game, Game::Player currentPlayer, Game::P
         // Run minimax on new move with other player
         Game::Player moveMax = moveGame.getCurrentPlayer();
         Game::Player moveMin = moveGame.getOtherPlayer();
-        Result result = minimax(&moveGame, moveMax, moveMax, moveMin, depth - 1);
+        Result result = minimax(&moveGame, moveMax, moveMax, moveMin, depth - 1, alpha, beta);
 
-        // Update best move if better than last found best move
-        if ((currentPlayer == max && result.score > score) || (currentPlayer == min && result.score < score)) {
+        // Update best move if better than last found best move and track alpha-beta pruning
+        if (currentPlayer == max && result.score > score) {
             score = result.score;
             move = allowedMove;
+            if (score > alpha) alpha = score;
+        }
+
+        if (currentPlayer == min && result.score < score) {
+            score = result.score;
+            move = allowedMove;
+            if (score < beta) beta = score;
+        }
+
+        // Cut alpha-beta (alpha-beta pruning)
+        if (alpha >= beta) {
+            return {score, move};
         }
     }
 

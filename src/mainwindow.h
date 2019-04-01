@@ -45,6 +45,8 @@ private:
     uint16_t getBoardSize();
     Starter getStarter();
     uint16_t getDifficulty();
+    int getAlpha();
+    int getBeta();
 
     QString spaceCamelCase(const QString &s);
 
